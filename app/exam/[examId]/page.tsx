@@ -155,8 +155,12 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
         <div className="bg-white rounded-lg shadow-md p-4 mb-6">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <span className="font-medium">Question {currentIndex + 1} of {exam.totalQuestions}</span>
-              <span className="text-gray-600 ml-4">Answered: {answeredCount}/{exam.totalQuestions}</span>
+              <span className="font-medium text-black">
+                Question {currentIndex + 1} of {exam.totalQuestions}
+              </span>
+              <span className="text-gray-600 ml-4">
+                Answered: {answeredCount}/{exam.totalQuestions}
+              </span>
             </div>
             <div className="text-lg font-semibold">
               Time: {formatTime(totalTime)}
@@ -179,23 +183,29 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
               </h2>
 
               <div className="space-y-3">
-                {['A', 'B', 'C', 'D'].map((option) => {
-                  const optionText = currentQuestion.question[`option_${option.toLowerCase()}` as keyof Question] as string;
+                {["A", "B", "C", "D"].map((option) => {
+                  const optionText = currentQuestion.question[
+                    `option_${option.toLowerCase()}` as keyof Question
+                  ] as string;
                   const isSelected = selectedAnswer === option;
 
                   return (
                     <button
                       key={option}
                       onClick={() => handleAnswerSelect(option)}
-                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                      className={`w-full text-left text-black p-4 rounded-lg border-2 transition-all ${
                         isSelected
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                     >
                       <div className="flex items-start">
-                        <span className="font-semibold mr-3 text-gray-700">{option}.</span>
-                        <span className={isSelected ? 'font-medium' : ''}>{optionText}</span>
+                        <span className="font-semibold mr-3 text-gray-700">
+                          {option}.
+                        </span>
+                        <span className={isSelected ? "font-medium" : ""}>
+                          {optionText}
+                        </span>
                       </div>
                     </button>
                   );
@@ -218,7 +228,9 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
                     disabled={!selectedAnswer}
                     className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
-                    {currentQuestion.userAnswer ? 'Update & Next' : 'Submit & Next'}
+                    {currentQuestion.userAnswer
+                      ? "Update & Next"
+                      : "Submit & Next"}
                   </button>
                 ) : (
                   <>
@@ -227,7 +239,9 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
                       disabled={!selectedAnswer}
                       className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
-                      {currentQuestion.userAnswer ? 'Update Answer' : 'Submit Answer'}
+                      {currentQuestion.userAnswer
+                        ? "Update Answer"
+                        : "Submit Answer"}
                     </button>
                     <button
                       onClick={handleFinishExam}
@@ -252,10 +266,10 @@ export default function ExamPage({ params }: { params: Promise<{ examId: string 
                     onClick={() => handleQuestionNavigation(idx)}
                     className={`aspect-square rounded flex items-center justify-center text-sm font-medium ${
                       idx === currentIndex
-                        ? 'bg-blue-600 text-white'
+                        ? "bg-blue-600 text-white"
                         : q.userAnswer
-                        ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? "bg-green-100 text-green-800 hover:bg-green-200"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
                     {idx + 1}
