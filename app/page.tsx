@@ -200,7 +200,7 @@ export default function Home() {
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h2 className="font-semibold text-blue-900 mb-2">About This Mock Test</h2>
           <ul className="space-y-2 text-sm text-blue-800">
-            <li>• Contains 150+ questions covering all certification domains</li>
+            <li>• Contains 1500+ questions covering all certification domains</li>
             <li>• Questions are randomly selected from the pool to ensure variety</li>
             <li>• System tracks previously seen questions to show you new ones</li>
             <li>• All exam history is saved for your review</li>
