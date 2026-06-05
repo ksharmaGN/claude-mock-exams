@@ -88,13 +88,19 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4">
         {/* Results Summary */}
-        <div className={`bg-white rounded-lg shadow-md p-8 mb-6 border-2 ${getScoreBgColor(result.scorePercentage)}`}>
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">Exam Results</h1>
+        <div
+          className={`bg-white rounded-lg shadow-md p-8 mb-6 border-2 ${getScoreBgColor(result.scorePercentage)}`}
+        >
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+            Exam Results
+          </h1>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
             <div>
               <div className="text-sm text-gray-600 mb-1">Score</div>
-              <div className={`text-3xl font-bold ${getScoreColor(result.scorePercentage)}`}>
+              <div
+                className={`text-3xl font-bold ${getScoreColor(result.scorePercentage)}`}
+              >
                 {result.scorePercentage.toFixed(1)}%
               </div>
             </div>
@@ -123,13 +129,19 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
 
           <div className="bg-white rounded-lg p-4 border">
             <div className="text-sm text-gray-600 mb-2">Exam Type</div>
-            <div className="font-medium">
-              {result.examType === 'week' ? 'Week-by-Week' : result.examType === 'domain' ? 'Domain-Specific' : 'Full Exam'}
+            <div className="font-medium text-black">
+              {result.examType === "week"
+                ? "Week-by-Week"
+                : result.examType === "domain"
+                  ? "Domain-Specific"
+                  : "Full Exam"}
             </div>
-            {result.examType !== 'full' && (
+            {result.examType !== "full" && (
               <>
                 <div className="text-sm text-gray-600 mt-2 mb-1">Topics</div>
-                <div className="text-sm">{JSON.parse(result.selectedTopics).join(', ')}</div>
+                <div className="text-sm">
+                  {JSON.parse(result.selectedTopics).join(", ")}
+                </div>
               </>
             )}
           </div>
@@ -154,31 +166,31 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
         <div className="bg-white rounded-lg shadow-md p-4 mb-6 flex flex-wrap gap-4 items-center">
           <div className="flex gap-2">
             <button
-              onClick={() => setFilterType('all')}
+              onClick={() => setFilterType("all")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                filterType === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterType === "all"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               All ({result.totalQuestions})
             </button>
             <button
-              onClick={() => setFilterType('correct')}
+              onClick={() => setFilterType("correct")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                filterType === 'correct'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterType === "correct"
+                  ? "bg-green-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               Correct ({result.correctAnswers})
             </button>
             <button
-              onClick={() => setFilterType('wrong')}
+              onClick={() => setFilterType("wrong")}
               className={`px-4 py-2 rounded-lg font-medium ${
-                filterType === 'wrong'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                filterType === "wrong"
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               Wrong ({result.wrongAnswers})
@@ -199,7 +211,7 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
         {/* Questions Review */}
         <div className="space-y-6">
           {filteredQuestions.map((item, idx) => {
-            const userAnswerLetter = item.userAnswer || 'Not answered';
+            const userAnswerLetter = item.userAnswer || "Not answered";
             const correctAnswerLetter = item.question.correct_answer;
             const isCorrect = item.isCorrect === true;
 
@@ -207,40 +219,48 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
               <div
                 key={idx}
                 className={`bg-white rounded-lg shadow-md p-6 border-2 ${
-                  isCorrect ? 'border-green-200' : 'border-red-200'
+                  isCorrect ? "border-green-200" : "border-red-200"
                 }`}
               >
                 <div className="flex items-start gap-4 mb-4">
-                  <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                    isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                  }`}>
-                    {isCorrect ? '✓' : '✗'}
+                  <div
+                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                      isCorrect
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {isCorrect ? "✓" : "✗"}
                   </div>
 
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">
                       Question {result.questions.indexOf(item) + 1}
                     </h3>
-                    <p className="text-gray-800 mb-4">{item.question.question}</p>
+                    <p className="text-gray-800 mb-4">
+                      {item.question.question}
+                    </p>
 
                     <div className="space-y-2">
-                      {['A', 'B', 'C', 'D'].map((option) => {
-                        const optionText = item.question[`option_${option.toLowerCase()}` as keyof Question] as string;
+                      {["A", "B", "C", "D"].map((option) => {
+                        const optionText = item.question[
+                          `option_${option.toLowerCase()}` as keyof Question
+                        ] as string;
                         const isUserAnswer = userAnswerLetter === option;
                         const isCorrectAnswer = correctAnswerLetter === option;
 
-                        let bgColor = 'bg-gray-50';
-                        let borderColor = 'border-gray-200';
-                        let textColor = 'text-gray-900';
+                        let bgColor = "bg-gray-50";
+                        let borderColor = "border-gray-200";
+                        let textColor = "text-gray-900";
 
                         if (isCorrectAnswer) {
-                          bgColor = 'bg-green-50';
-                          borderColor = 'border-green-500';
-                          textColor = 'text-green-900';
+                          bgColor = "bg-green-50";
+                          borderColor = "border-green-500";
+                          textColor = "text-green-900";
                         } else if (isUserAnswer && !isCorrect) {
-                          bgColor = 'bg-red-50';
-                          borderColor = 'border-red-500';
-                          textColor = 'text-red-900';
+                          bgColor = "bg-red-50";
+                          borderColor = "border-red-500";
+                          textColor = "text-red-900";
                         }
 
                         return (
@@ -249,13 +269,21 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
                             className={`p-3 rounded-lg border-2 ${bgColor} ${borderColor}`}
                           >
                             <div className="flex items-start">
-                              <span className={`font-semibold mr-3 ${textColor}`}>{option}.</span>
+                              <span
+                                className={`font-semibold mr-3 ${textColor}`}
+                              >
+                                {option}.
+                              </span>
                               <span className={textColor}>{optionText}</span>
                               {isCorrectAnswer && (
-                                <span className="ml-auto text-green-700 font-semibold">✓ Correct</span>
+                                <span className="ml-auto text-green-700 font-semibold">
+                                  ✓ Correct
+                                </span>
                               )}
                               {isUserAnswer && !isCorrect && (
-                                <span className="ml-auto text-red-700 font-semibold">Your Answer</span>
+                                <span className="ml-auto text-red-700 font-semibold">
+                                  Your Answer
+                                </span>
                               )}
                             </div>
                           </div>
@@ -265,8 +293,12 @@ export default function ResultsPage({ params }: { params: Promise<{ examId: stri
 
                     {showExplanations && (
                       <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="font-semibold text-blue-900 mb-2">Explanation:</div>
-                        <p className="text-blue-800 text-sm">{item.question.explanation}</p>
+                        <div className="font-semibold text-blue-900 mb-2">
+                          Explanation:
+                        </div>
+                        <p className="text-blue-800 text-sm">
+                          {item.question.explanation}
+                        </p>
                       </div>
                     )}
 
