@@ -7,11 +7,12 @@ export async function POST(request: NextRequest) {
     seedQuestions();
 
     const body = await request.json();
-    const { examType, selectedTopics } = body;
+    const { examType, selectedTopics, questionCount } = body;
 
     const examId = createExam({
       examType,
       selectedTopics,
+      questionCount,
     });
 
     return NextResponse.json({ examId });

@@ -18,6 +18,7 @@ export default function Home() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [availableTopics, setAvailableTopics] = useState<AvailableTopics>({ weeks: [], domains: [] });
   const [loading, setLoading] = useState(false);
+  const [questionCount, setQuestionCount] = useState<50 | 100>(50);
 
   useEffect(() => {
     // Fetch available topics
@@ -53,6 +54,7 @@ export default function Home() {
         body: JSON.stringify({
           examType,
           selectedTopics: examType === 'full' ? [] : selectedTopics,
+          questionCount: examType === 'full' ? questionCount : undefined,
         }),
       });
 
@@ -65,7 +67,16 @@ export default function Home() {
   };
 
   const currentTopics = examType === 'week' ? availableTopics.weeks : availableTopics.domains;
-  const expectedQuestions = examType === 'full' ? 50 : selectedTopics.length * 10;
+
+  // Calculate expected questions based on exam type
+  let expectedQuestions = 0;
+  if (examType === 'full') {
+    expectedQuestions = questionCount;
+  } else if (examType === 'domain' && selectedTopics.length === 1) {
+    expectedQuestions = 25;
+  } else {
+    expectedQuestions = selectedTopics.length * 10;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -113,8 +124,8 @@ export default function Home() {
                     Domain-Specific Topics
                   </div>
                   <div className="text-sm text-gray-600">
-                    Select specific domains to practice (10 questions per
-                    domain)
+
+                    Select specific domains (25 questions for 1 domain, 10 per domain for multiple)
                   </div>
                 </button>
 
@@ -128,11 +139,44 @@ export default function Home() {
                 >
                   <div className="font-medium text-black">Full Exam</div>
                   <div className="text-sm text-gray-600">
-                    Complete practice exam with 50 questions across all domains
+                    Complete practice exam across all domains (choose 50 or 100 questions)
                   </div>
                 </button>
               </div>
             </div>
+
+            {/* Question Count Selection for Full Exam */}
+            {examType === 'full' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Select Number of Questions
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setQuestionCount(50)}
+                    className={`px-4 py-3 rounded-lg border-2 transition-colors ${
+                      questionCount === 50
+                        ? 'border-blue-500 bg-blue-50 text-blue-900'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="font-medium">50 Questions</div>
+                    <div className="text-sm text-gray-600">~1 hour exam</div>
+                  </button>
+                  <button
+                    onClick={() => setQuestionCount(100)}
+                    className={`px-4 py-3 rounded-lg border-2 transition-colors ${
+                      questionCount === 100
+                        ? 'border-blue-500 bg-blue-50 text-blue-900'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="font-medium">100 Questions</div>
+                    <div className="text-sm text-gray-600">~2 hour exam</div>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Topic Selection */}
             {examType !== "full" && (

@@ -4,6 +4,7 @@ import { questionBank, Question } from './question-bank';
 export interface ExamConfig {
   examType: 'week' | 'domain' | 'full';
   selectedTopics: string[]; // week numbers or domain names
+  questionCount?: 50 | 100; // For full exam only
 }
 
 export interface ExamQuestion {
@@ -81,6 +82,42 @@ export function seedQuestions() {
   }
 }
 
+// Domain to topic mapping
+const domainTopicMapping: { [key: string]: string[] } = {
+  'Agentic Architecture & Orchestration': [
+    'Agentic Loops & Core API',
+    'Multi-Agent Orchestration'
+  ],
+  'Tool Design & MCP Integration': [
+    'Tool Design & MCP'
+  ],
+  'Claude Code Configuration & Workflows': [
+    'Hooks, Workflows & Sessions',
+    'Claude Code Configuration',
+    'Plan Mode & CI/CD'
+  ],
+  'Prompt Engineering & Structured Output': [
+    'Prompt Engineering & Structured Output'
+  ],
+  'Context Management & Reliability': [
+    'Validation, Batch & Multi-Pass',
+    'Context Management',
+    'Advanced Context & Provenance'
+  ],
+  'Integration & Production Best Practices': [
+    'Integration & Best Practices'
+  ]
+};
+
+// Module weightage for full exam (percentages)
+const moduleWeightage: { [key: string]: number } = {
+  'Agentic Architecture & Orchestration': 0.25,
+  'Tool Design & MCP Integration': 0.20,
+  'Claude Code Configuration & Workflows': 0.20,
+  'Prompt Engineering & Structured Output': 0.20,
+  'Context Management & Reliability': 0.15
+};
+
 // Get random questions based on exam configuration
 export function getRandomQuestions(config: ExamConfig, userId: string = 'default'): ExamQuestion[] {
   const db = getDb();
@@ -111,11 +148,59 @@ export function getRandomQuestions(config: ExamConfig, userId: string = 'default
 
     return allQuestions;
   } else if (config.examType === 'domain') {
-    // Domain-specific: 10 questions per selected domain
-    const questionsPerDomain = 10;
     const allQuestions: ExamQuestion[] = [];
 
     for (const domain of config.selectedTopics) {
+      if (config.selectedTopics.length === 1) {
+        // Single domain: 25 questions distributed equally across topics
+        const topics = domainTopicMapping[domain] || [];
+        const questionsPerTopic = Math.floor(25 / topics.length);
+        const remainder = 25 % topics.length;
+
+        for (let i = 0; i < topics.length; i++) {
+          const topic = topics[i];
+          // Add 1 extra question to first few topics to handle remainder
+          const limit = questionsPerTopic + (i < remainder ? 1 : 0);
+
+          query = `
+            SELECT q.* FROM questions q
+            LEFT JOIN question_usage qu ON q.id = qu.question_id AND qu.user_id = ?
+            WHERE q.domain = ? AND q.topic = ?
+            ORDER BY
+              CASE WHEN qu.last_used IS NULL THEN 0 ELSE 1 END,
+              qu.last_used ASC,
+              RANDOM()
+            LIMIT ?
+          `;
+          const questions = db.prepare(query).all(userId, domain, topic, limit) as ExamQuestion[];
+          allQuestions.push(...questions);
+        }
+      } else {
+        // Multiple domains: 10 questions per domain
+        query = `
+          SELECT q.* FROM questions q
+          LEFT JOIN question_usage qu ON q.id = qu.question_id AND qu.user_id = ?
+          WHERE q.domain = ?
+          ORDER BY
+            CASE WHEN qu.last_used IS NULL THEN 0 ELSE 1 END,
+            qu.last_used ASC,
+            RANDOM()
+          LIMIT 10
+        `;
+        const questions = db.prepare(query).all(userId, domain, 10) as ExamQuestion[];
+        allQuestions.push(...questions);
+      }
+    }
+
+    return allQuestions;
+  } else {
+    // Full exam: 50 or 100 questions distributed by module weightage
+    const allQuestions: ExamQuestion[] = [];
+    const totalQuestions = config.questionCount || 50; // Default to 50 if not specified
+
+    for (const [domain, weight] of Object.entries(moduleWeightage)) {
+      const questionsForDomain = Math.round(totalQuestions * weight);
+
       query = `
         SELECT q.* FROM questions q
         LEFT JOIN question_usage qu ON q.id = qu.question_id AND qu.user_id = ?
@@ -126,23 +211,35 @@ export function getRandomQuestions(config: ExamConfig, userId: string = 'default
           RANDOM()
         LIMIT ?
       `;
-      const questions = db.prepare(query).all(userId, domain, questionsPerDomain) as ExamQuestion[];
+      const questions = db.prepare(query).all(userId, domain, questionsForDomain) as ExamQuestion[];
       allQuestions.push(...questions);
     }
 
+    // If we don't have exactly the target questions due to rounding, adjust
+    const currentTotal = allQuestions.length;
+    if (currentTotal < totalQuestions) {
+      // Get additional random questions from any domain to reach target
+      const needed = totalQuestions - currentTotal;
+      const usedIds = allQuestions.map(q => q.id);
+
+      query = `
+        SELECT q.* FROM questions q
+        LEFT JOIN question_usage qu ON q.id = qu.question_id AND qu.user_id = ?
+        WHERE q.id NOT IN (${usedIds.join(',')})
+        ORDER BY
+          CASE WHEN qu.last_used IS NULL THEN 0 ELSE 1 END,
+          qu.last_used ASC,
+          RANDOM()
+        LIMIT ?
+      `;
+      const additionalQuestions = db.prepare(query).all(userId, needed) as ExamQuestion[];
+      allQuestions.push(...additionalQuestions);
+    } else if (currentTotal > totalQuestions) {
+      // Trim to exactly target questions
+      return allQuestions.slice(0, totalQuestions);
+    }
+
     return allQuestions;
-  } else {
-    // Full exam: 50 questions distributed across all domains
-    query = `
-      SELECT q.* FROM questions q
-      LEFT JOIN question_usage qu ON q.id = qu.question_id AND qu.user_id = ?
-      ORDER BY
-        CASE WHEN qu.last_used IS NULL THEN 0 ELSE 1 END,
-        qu.last_used ASC,
-        RANDOM()
-      LIMIT 50
-    `;
-    return db.prepare(query).all(userId) as ExamQuestion[];
   }
 }
 
